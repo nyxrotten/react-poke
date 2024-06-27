@@ -3,34 +3,43 @@ import {useEffect, useState} from 'react';
 import axios from 'axios';
 
 function App() {
-  const [pokemon, setPokemon] = useState({});
-  const [urlParams, setUrlParams] = useState("")
+  const urlBase = "https://pokeapi.co/api/v2/pokemon/"
+  const [pokemon, setPokemon] = useState([{}]);
+  const [search, setSearch] = useState("");
+  const [pokemonFound, setPokemonFound] = useState("")
 
 
   const handleChange = (e) => {
-    setPokemon(e.target.value);
-    setUrlParams(e.target.value)
-    console.log(pokemon)
-    console.log(urlParams)
+    setSearch(e.target.value);
+    console.log(search)
   }
 
   const getPokemon = async () => {
     const getPokemonFromApi = await axios.get("https://pokeapi.co/api/v2/pokemon/?offset=0&limit=1302");
     const pokemonsData = getPokemonFromApi.data.results
-    setPokemon({...pokemonsData})
-    console.log(pokemon)
+    setPokemon([...pokemon, ...pokemonsData])
   }
 
   useEffect (() => {
-    alert(pokemon[0].name)
-  })
+    getPokemon()
+    const found = pokemon.find((poke) => poke.name === search)
+    if (found == true) {
+      setPokemonFound([...pokemonFound, ...found])
+      const pokeData =  axios.get(`${urlBase}${found.name}`)
+      const onePokemon = pokeData.data 
+    }
+    console.log (found)
+    
+  }, [search])
+
+
   return (
   <>
     <div className='pokeBox'>
     <h2>Find your Pokémon</h2>
       <div className='searchBox'>
       <input type="text" placeholder='Pokemon name' onChange={handleChange}></input>
-      <button onClick={getPokemon}>Catch'em all</button>
+      {/* <button onClick={getPokemon}>Catch'em all</button> */}
       </div>
       <div className='pokemonCard'>
         <h3>Pokémon name:</h3>
